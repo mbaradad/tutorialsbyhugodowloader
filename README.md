@@ -1,4 +1,4 @@
-# tutorialsbyhugodowloader
+# TutorialsByHugo downloader
 Parses piano videos (from tutorials by hugo) into printable sheets. Could be easily extended to other similar video sources.
 Tested with pytho 
 
