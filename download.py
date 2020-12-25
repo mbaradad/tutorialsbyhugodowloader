@@ -1,10 +1,14 @@
+
+import matplotlib
+matplotlib.use("Qt5Agg")
+from matplotlib import pyplot as plt
+
 import os
 import shutil
 
 import argparse
 import numpy as np
 import youtube_dl
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 import cv2
 
@@ -24,7 +28,8 @@ args = parser.parse_args()
 
 
 DOWNLOAD_PATH = "/tmp/{}".format(args.url.split('?v=')[-1])
-ydl = youtube_dl.YoutubeDL({'outtmpl': '{}/%(id)s.%(ext)s'.format(DOWNLOAD_PATH)})
+ydl = youtube_dl.YoutubeDL({'outtmpl': '{}/%(id)s.%(ext)s'.format(DOWNLOAD_PATH),
+                            'nocheckcertificate': True})
 if os.path.exists(DOWNLOAD_PATH):
   shutil.rmtree(DOWNLOAD_PATH)
 os.makedirs(DOWNLOAD_PATH)
@@ -56,17 +61,12 @@ frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count // 2) # optional
 success, image = cap.read()
 
-def imshow(frame):
-  plt.imshow(frame)
-  plt.show()
 
 sheet_ROI = cv2.selectROI("Select sheet region", image)
 sheet = image[sheet_ROI[1]:sheet_ROI[1] + sheet_ROI[3],sheet_ROI[0]:sheet_ROI[0] + sheet_ROI[2]]
 number_ROI = cv2.selectROI("Select sheet number region", sheet)
 number = sheet[number_ROI[1]:number_ROI[1] + number_ROI[3],
                  number_ROI[0]:number_ROI[0] + number_ROI[2]]
-
-imshow(number)
 
 # iterate through the frames
 sheets = []
@@ -79,6 +79,7 @@ i = 0
 cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
 success, frame = cap.read()
+print("Processing file")
 while success:
     height, width, _ = frame.shape
     sheet = frame[sheet_ROI[1]:sheet_ROI[3], sheet_ROI[0]:sheet_ROI[2]]
