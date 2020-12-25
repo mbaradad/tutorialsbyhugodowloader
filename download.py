@@ -73,7 +73,7 @@ sheets = []
 numbers = []
 white_percentages = []
 
-
+SUBSAMPLE=10
 pbar = tqdm(total=frame_count)
 i = 0
 cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
@@ -81,14 +81,15 @@ cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 success, frame = cap.read()
 print("Processing file")
 while success:
-    height, width, _ = frame.shape
-    sheet = frame[sheet_ROI[1]:sheet_ROI[3], sheet_ROI[0]:sheet_ROI[2]]
-    number = sheet[number_ROI[1]:number_ROI[1] + number_ROI[3],
+    if i % SUBSAMPLE == 0:
+        height, width, _ = frame.shape
+        sheet = frame[sheet_ROI[1]:sheet_ROI[3], sheet_ROI[0]:sheet_ROI[2]]
+        number = sheet[number_ROI[1]:number_ROI[1] + number_ROI[3],
              number_ROI[0]:number_ROI[0] + number_ROI[2]]
 
-    numbers.append(number)
-    sheets.append(sheet)
-    white_percentages.append((sheet > 240).mean())
+        numbers.append(number)
+        sheets.append(sheet)
+        white_percentages.append((sheet > 240).mean())
     i += 1
     pbar.update(1)
     success, frame = cap.read()
@@ -118,8 +119,8 @@ diffs = np.array(diffs)
 
 valid_diffs = diffs > 5
 
-plt.plot(valid_diffs)
-plt.show()
+#plt.plot(valid_diffs)
+#plt.show()
 final_sheets = []
 for k in range(len(sheets)):
   if valid_diffs[k] and not valid_diffs[k - 1]:
